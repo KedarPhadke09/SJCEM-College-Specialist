@@ -1,10 +1,14 @@
 import os
 import streamlit as st
-from dotenv import load_dotenv
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from google import genai
 from google.genai import types
-
-load_dotenv()
 
 MODEL = "gemini-3.5-flash"  # confirm the exact ID in Google AI Studio
 
@@ -81,9 +85,11 @@ KNOWLEDGE BASE:
 
 @st.cache_resource
 def get_client():
-    key = os.environ.get("AQ.Ab8RN6JOzbGjeK4fovGyBEmOgASL3zaZypN9ryjW6vKFDkL9nA")
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key and "GEMINI_API_KEY" in st.secrets:
+        key = st.secrets["GEMINI_API_KEY"]
     if not key:
-        st.error("GEMINI_API_KEY not found. Add it to your .env file.")
+        st.error("GEMINI_API_KEY not found. Please add it to your .env file or Streamlit Cloud Secrets.")
         st.stop()
     return genai.Client(api_key=key)
 
